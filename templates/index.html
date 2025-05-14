@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Item Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 2rem;
+        }
+        .header {
+            background-color: #007BFF;
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .header a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+        .header a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        .items-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        .item-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+        }
+        .item-card img {
+            width: 300px;
+            height: 200px;
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+        .item-card img:hover {
+            transform: scale(1.05);
+        }
+        .item-card p {
+            padding: 1rem;
+            margin: 0;
+            color: #333;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+        }
+        /* 图片放大弹窗样式 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            padding-top: 100px;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
+        }
+        .modal-content {
+            margin: auto;
+            display: block;
+            width: 80%;
+            max-width: 700px;
+        }
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 35px;
+            color: #f1f1f1;
+            font-size: 40px;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .close:hover,
+        .close:focus {
+            color: #bbb;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        /* 编辑描述弹窗样式 */
+        .edit-modal {
+            display: none;
+            position: fixed;
+            z-index: 2;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .edit-modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            border-radius: 8px;
+        }
+        .edit-modal-content input[type="text"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            box-sizing: border-box;
+        }
+        .edit-modal-buttons {
+            display: flex;
+            justify-content: space-between;
+        }
+        .edit-modal-buttons button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .edit-modal-buttons .confirm {
+            background-color: #007BFF;
+            color: white;
+        }
+        .edit-modal-buttons .cancel {
+            background-color: #ccc;
+            color: black;
+        }
+        .edit-button {
+            padding: 0.5rem 1rem;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+        .delete-button {
+            padding: 0.5rem 1rem;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 1rem;
+        }
+        /* 删除确认弹窗样式 */
+        .delete-confirm-modal {
+            display: none;
+            position: fixed;
+            z-index: 3;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .delete-confirm-modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .delete-confirm-modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1rem;
+        }
+        .delete-confirm-modal-buttons button {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .delete-confirm-modal-buttons .confirm {
+            background-color: #dc3545;
+            color: white;
+        }
+        .delete-confirm-modal-buttons .cancel {
+            background-color: #ccc;
+            color: black;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>物品管理</h1>
+        <div>
+            <a href="{{ url_for('add_item') }}">添加新物品</a>
+            <a href="{{ url_for('logout') }}">退出系统</a>
+            <a href="{{ url_for('ai_chat') }}">AI 管理</a>
+        </div>
+    </div>
+    <div class="items-container">
+        {% for item in items %}
+            <div class="item-card">
+                <img src="{{ url_for('static', filename='uploads/' + item.image) }}" alt="{{ item.description }}" onclick="openModal(this.src)">
+                <div style="display: flex; align-items: center;">
+                    <p>{{ item.description }}</p>
+                    <!-- 使用 data-id 属性传递数据库物品 id -->
+                    <button 
+                        class="edit-button" 
+                        data-id="{{ item.id }}" 
+                        data-description="{{ item.description|e }}" 
+                        onclick="openEditModal(this)">修改描述</button>
+                    <button 
+                        class="delete-button" 
+                        data-id="{{ item.id }}" 
+                        onclick="openDeleteConfirmModal(this)">删除</button> 
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- 图片放大弹窗 -->
+    <div id="myModal" class="modal">
+        <span class="close">&times;</span>
+        <img class="modal-content" id="img01">
+    </div>
+
+    <!-- 编辑描述弹窗 -->
+    <div id="editModal" class="edit-modal">
+        <div class="edit-modal-content">
+            <input type="text" id="editDescriptionInput">
+            <div class="edit-modal-buttons">
+                <button class="confirm" onclick="confirmEdit()">确定</button>
+                <button class="cancel" onclick="closeEditModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+     <!-- 删除确认弹窗 -->
+     <div id="deleteConfirmModal" class="delete-confirm-modal">
+        <div class="delete-confirm-modal-content">
+            <p>确定要删除这个物品吗？</p>
+            <div class="delete-confirm-modal-buttons">
+                <button class="confirm" onclick="confirmDelete()">确定</button>
+                <button class="cancel" onclick="closeDeleteConfirmModal()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 图片放大弹窗相关代码
+        var modal = document.getElementById("myModal");
+        var modalImg = document.getElementById("img01");
+        var span = document.getElementsByClassName("close")[0];
+
+        function openModal(imgSrc) {
+            modal.style.display = "block";
+            modalImg.src = imgSrc;
+        }
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // 编辑描述弹窗相关代码
+        var editModal = document.getElementById("editModal");
+        var editDescriptionInput = document.getElementById("editDescriptionInput");
+        var currentItemId;
+
+        function openEditModal(button) {
+            try {
+                const id = parseInt(button.dataset.id);
+                const description = button.dataset.description;
+                console.log('openEditModal called with id:', id, 'description:', description);
+                if (isNaN(id) || !description) {
+                    console.error('Invalid id or description data attributes');
+                    return;
+                }
+                currentItemId = id;
+                editDescriptionInput.value = description;
+                editModal.style.display = "block";
+            } catch (error) {
+                console.error('Error in openEditModal:', error);
+            }
+        }
+
+        function closeEditModal() {
+            editModal.style.display = "none";
+        }
+
+        function confirmEdit() {
+            var newDescription = editDescriptionInput.value;
+            // 创建表单并提交
+            var form = document.createElement('form');
+            form.method = 'post';
+            form.action = "{{ url_for('edit_item', item_id=0) }}".replace('0', currentItemId);
+
+            var descriptionInput = document.createElement('input');
+            descriptionInput.type = 'hidden';
+            descriptionInput.name = 'description';
+            descriptionInput.value = newDescription;
+
+            form.appendChild(descriptionInput);
+            document.body.appendChild(form);
+            console.log('Submitting form with action:', form.action, 'description:', newDescription);
+            form.submit();
+        }
+
+        // 删除确认弹窗相关代码
+        var deleteConfirmModal = document.getElementById("deleteConfirmModal");
+        var deleteItemId;
+
+        function openDeleteConfirmModal(button) {
+            deleteItemId = parseInt(button.dataset.id);
+            deleteConfirmModal.style.display = "block";
+        }
+
+        function closeDeleteConfirmModal() {
+            deleteConfirmModal.style.display = "none";
+        }
+
+        function confirmDelete() {
+            window.location.href = "{{ url_for('delete_item', item_id=0) }}".replace('0', deleteItemId);
+            closeDeleteConfirmModal();
+        }
+    </script>
+</body>
+</html>

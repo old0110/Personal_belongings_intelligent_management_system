@@ -1,0 +1,350 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI 对话</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --background-color: #f5f6fa;
+            --text-color: #2d3436;
+            --border-color: #dfe6e9;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            margin: 0;
+            padding: 2rem;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 2.5rem;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 600;
+        }
+
+        .item-info {
+            background-color: #e8f4ff;
+            border-left: 4px solid var(--secondary-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .item-info h2 {
+            color: var(--secondary-color);
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 0.8rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        textarea {
+            padding: 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            resize: vertical;
+            font-size: 1rem;
+            line-height: 1.5;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        button {
+            padding: 1rem 2rem;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .response {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            background-color: #fdfdfd;
+        }
+
+        .response h2 {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 0.8rem;
+        }
+
+        .response p {
+            margin: 0;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI 物品查询 (Powered by DeepSeek)</h1>
+        <form method="post">
+            <textarea name="question" rows="5" placeholder="请输入你的问题。"></textarea>
+            <button type="submit">发送</button>
+        </form>
+        {% if question %}
+            <div class="response">
+                <h2>你的问题:</h2>
+                <p>{{ question }}</p>
+                <h2>AI 回答:</h2>
+                <p>{{ answer }}</p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html> -->
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 问答助手</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background-color: rgba(100, 116, 139, 0.4);
+      border-radius: 4px;
+    }
+    .typing-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background-color: #6b7280;
+      border-radius: 50%;
+      margin: 0 2px;
+      animation: typing 1s infinite;
+    }
+
+    @keyframes typing {
+      0%, 80%, 100% {
+        transform: scale(0);
+      }
+      40% {
+        transform: scale(1);
+      }
+    }
+
+    /* 增大对话框字体 */
+    .chat-message {
+      font-size: 1rem; 
+      line-height: 1.6;
+    }
+
+    /* 优化输入框容器样式 */
+    .input-container {
+      position: relative;
+      border: 2px solid #d1d5db;
+      border-radius: 1rem;
+      background-color: white;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      max-width: 600px; /* 限制输入框容器最大宽度 */
+      width: 80%; /* 输入框容器宽度为视口宽度的 80% */
+      margin: 0 auto; /* 使输入框容器水平居中 */
+    }
+
+    .input-container:focus-within {
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    /* 优化输入框样式 */
+    #question-input {
+      width: 100%;
+      font-size: 1rem;
+      padding: 1.2rem 10rem 1.2rem 1.5rem; 
+      border: none;
+      border-radius: 1rem;
+      outline: none;
+    }
+
+    /* 优化发送按钮样式 */
+    #send-button {
+      position: absolute;
+      right: 0.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      padding: 0.8rem 1.5rem;
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 0.8rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #send-button:hover {
+      background-color: #2563eb;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 h-screen flex font-sans text-sm text-gray-800">
+
+  <!-- 主内容区域 -->
+  <main class="flex-1 flex flex-col m-4">
+
+    <!-- 顶部导航栏 -->
+    <header class="bg-white shadow px-6 py-4 rounded-lg">
+      <h1 class="text-2xl font-semibold">AI 问答助手</h1>
+    </header>
+
+   
+   
+    <div class="bg-yellow-100 text-yellow-800 p-4 border-l-4 border-yellow-500 mt-4 rounded-lg">
+      <h2 class="text-lg font-semibold">介绍: 这是阿毅的专属私人物品智能管理助手</h2>
+    </div>
+   
+
+    <!-- 聊天内容 -->
+    <section id="chat" class="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-white to-gray-100 mt-4 rounded-lg">
+      <!-- 历史对话 -->
+      {% if question %}
+        <!-- 用户消息 -->
+        <div class="flex items-start justify-end space-x-3" id="user-question-{{ loop.index }}">
+          <div class="bg-blue-500 text-white px-4 py-3 rounded-2xl max-w-xl chat-message">
+            {{ question }}
+          </div>
+          <div class="w-8 h-8 bg-gray-300 text-gray-700 rounded-full flex items-center justify-center font-bold">我</div>
+        </div>
+        <!-- AI 消息 -->
+        <div class="flex items-start space-x-3" id="ai-answer-{{ loop.index }}">
+          <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">AI</div>
+          <div class="bg-white shadow px-4 py-3 rounded-2xl max-w-xl chat-message">
+            {{ answer }}
+          </div>
+        </div>
+      {% endif %}
+    </section>
+
+    <!-- 输入区域 -->
+    <footer class="bg-white px-6 py-4 border-t mt-4 rounded-lg">
+      <form id="chat-form" class="flex items-center">
+        <div class="input-container flex-1">
+          <input
+            type="text"
+            id="question-input"
+            name="question"
+            placeholder="请输入你的问题..."
+          />
+          <button
+            type="submit"
+            id="send-button"
+          >
+            发送
+          </button>
+        </div>
+      </form>
+    </footer>
+
+  </main>
+
+  <script>
+    const aiChatUrl = "{{ url_for('ai_chat') }}";
+    document.getElementById('chat-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const questionInput = document.getElementById('question-input');
+      const question = questionInput.value.trim();
+      if (question) {
+        // 即时显示用户问题
+        const chatSection = document.getElementById('chat');
+        const userMessage = document.createElement('div');
+        userMessage.className = 'flex items-start justify-end space-x-3';
+        userMessage.innerHTML = `
+          <div class="bg-blue-500 text-white px-4 py-3 rounded-2xl max-w-xl chat-message">
+            ${question}
+          </div>
+          <div class="w-8 h-8 bg-gray-300 text-gray-700 rounded-full flex items-center justify-center font-bold">我</div>
+        `;
+        chatSection.appendChild(userMessage);
+
+        // 显示 AI 正在思考
+        const aiMessage = document.createElement('div');
+        aiMessage.className = 'flex items-start space-x-3';
+        aiMessage.innerHTML = `
+          <div class="w-8 h-8 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">AI</div>
+          <div class="bg-white shadow px-4 py-3 rounded-2xl max-w-xl chat-message">
+            <span class="typing-indicator"></span>
+            <span class="typing-indicator"></span>
+            <span class="typing-indicator"></span>
+            正在思考...
+          </div>
+        `;
+        chatSection.appendChild(aiMessage);
+
+        // 滚动到聊天区域底部
+        chatSection.scrollTop = chatSection.scrollHeight;
+
+        // 发送请求
+        fetch(aiChatUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: `question=${encodeURIComponent(question)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+          // 更新 AI 回答
+          const aiAnswerDiv = aiMessage.querySelector('.bg-white');
+          aiAnswerDiv.innerHTML = data.answer;
+        })
+        .catch(error => {
+          console.error('请求出错:', error);
+          const aiAnswerDiv = aiMessage.querySelector('.bg-white');
+          aiAnswerDiv.innerHTML = '请求出错，请稍后重试。';
+        });
+
+        // 清空输入框
+        questionInput.value = '';
+      }
+    });
+  </script>
+</body>
+</html>
