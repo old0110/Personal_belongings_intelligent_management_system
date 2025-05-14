@@ -4,11 +4,15 @@
 Python+Flask+MYSQL+DeepSeek
 
 app.py为json形式保存信息
+
 app2.py为数据库保存信息
 
 运行:
+
 1.python app.py
+
 2.python app2.py
+
 static\uploads为保存图片的目录，启动项目添加物品后，图片会保存到这里
 
 登录界面:![image](https://github.com/user-attachments/assets/a5bd22a4-1734-4139-86ee-9eab2d5ba6fc)
