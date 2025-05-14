@@ -13,7 +13,7 @@ app.config['UPLOAD_FOLDER'] = 'static/uploads'
 app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 
 # 模拟用户数据库
-users = {'lvy': '123456'}
+users = {'user': '123456'}
 # 物品信息存储文件
 ITEMS_FILE = 'items.json'
 
@@ -139,7 +139,7 @@ def ai_chat():
         try:
             # 替换为你的 DeepSeek API 密钥
             client = OpenAI(
-                api_key="sk-0ac0df5c32b64b688d7e567d69faa8d7",
+                api_key="替换为你自己的key",
                 base_url="https://api.deepseek.com"
             )
             response = client.chat.completions.create(
