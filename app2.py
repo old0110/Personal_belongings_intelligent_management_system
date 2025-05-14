@@ -13,8 +13,8 @@ app.config['ALLOWED_EXTENSIONS'] = {'png', 'jpg', 'jpeg', 'gif'}
 # 数据库配置
 DB_CONFIG = {
     'host': 'localhost',
-    'user': 'root',
-    'password': 'root',
+    'user': '替换为你自己的user',
+    'password': '替换为你自己的password',
     'database': 'personal_item_sys',
     'cursorclass': pymysql.cursors.DictCursor
 }
@@ -218,7 +218,7 @@ def ai_chat():
             try:
                 # 替换为你的 DeepSeek API 密钥
                 client = OpenAI(
-                    api_key="sk-0ac0df5c32b64b688d7e567d69faa8d7",
+                    api_key="替换为你自己的key",
                     base_url="https://api.deepseek.com"
                 )
                 response = client.chat.completions.create(
