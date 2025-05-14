@@ -1,0 +1,15 @@
+创建 users 表
+CREATE TABLE users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(80) UNIQUE NOT NULL,
+    password VARCHAR(120) NOT NULL
+);
+
+创建 items 表时设置外键约束为 ON DELETE CASCADE
+CREATE TABLE items (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    description VARCHAR(200) NOT NULL,
+    image VARCHAR(200),
+    user_id INT NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
